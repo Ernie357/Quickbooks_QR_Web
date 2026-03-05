@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookkeeping Automation</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 10px;
+            border: 2px solid black;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: white;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+            border-radius: 20px;
+            background-color: #F2F0EF;
+            width: 300px;
+            padding: 10px;
+            filter: drop-shadow(0px 4px 10px #000000);
+        }
+    </style>
+</head>
+<body>
+    <h1>Bookkeeping Automation App</h1>
+    <form method="POST" action="{{ url_for('index') }}">
+        <p>Please sign into Quickbooks to continue</p>
+        <button type="submit">Sign in</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,14 @@
+errors.txt
+invoice_mail/
+__pycache__/
+qr_codes/
+*.docx
+*.xlsx
+*.csv
+test.py
+.env
+dist/
+build/
+buil/main/
+*.exe
+uploads/

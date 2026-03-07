@@ -52,7 +52,8 @@ class QRCodeHandler:
         print("Generating QR Codes...")
         if len(ids) <= 0:
             print("\nNo data found. No QR Codes to generate.")
-        full_target_dir = "qr_codes"
+        script_path = get_full_script_dir()
+        full_target_dir = os.path.join(script_path, target_dir)
         if not os.path.exists(full_target_dir):
             os.makedirs(full_target_dir)
         for id in ids:
@@ -61,7 +62,7 @@ class QRCodeHandler:
             print("QR Link:", link)
             filename = f"invoice_link_{id}.png"
             (img, _) = self.make_image_from_link(link, filename)
-            save_path = f"{full_target_dir}\\{filename}"
+            save_path = os.path.join(full_target_dir, filename)
             self.save_img((img, save_path))
             self.code_links.append(link)
 

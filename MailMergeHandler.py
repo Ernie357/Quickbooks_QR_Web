@@ -50,8 +50,8 @@ class MailMergeHandler:
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
         script_path = get_full_script_dir()
-        full_target_dir = f"{script_path}\\{out_dir}"
-        out_file = f"{full_target_dir}\\invoice_{id}.docx"
+        full_target_dir = os.path.join(script_path, out_dir)
+        out_file = os.path.join(full_target_dir, f"invoice_{id}.docx")
         self.write_document_out(out_file=out_file)
         image_pairs = [("media/image4", image)]
         self.replace_images(doc_filename=out_file, image_pairs=image_pairs)

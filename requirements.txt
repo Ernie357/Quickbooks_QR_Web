@@ -1,0 +1,9 @@
+flask
+requests
+python-docx
+docx-mailmerge2
+openpyxl
+qrcode
+Pillow
+python-dotenv
+werkzeug

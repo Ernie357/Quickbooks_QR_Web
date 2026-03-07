@@ -48,6 +48,8 @@ def get_credentials(is_prod) -> tuple[str, str]:
     return (access_token, realm_id)
 
 def get_filename_with_ext(dir: str, ext: str):
+    if not os.path.exists(dir):
+        return "None"
     for filename in glob.iglob(f"{dir}/*{ext}"):
         return filename
     return "None"
@@ -59,7 +61,7 @@ def zip_all_dir_files(dir: str, output_zip: str):
     shutil.make_archive(output_zip, 'zip', dir)
 
 def remove_files_with_ext(dir: str, ext: str):
-    if len(os.listdir(dir)) == 0:
+    if not os.path.exists(dir) or len(os.listdir(dir)) == 0:
         return
     for filename in glob.iglob(f"{dir}/*{ext}"):
         os.remove(filename)

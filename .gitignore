@@ -11,3 +11,5 @@ buil/main/
 *.exe
 uploads/
 *.zip
+qr_codes/
+invoice_mail/

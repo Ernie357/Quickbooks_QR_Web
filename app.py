@@ -136,6 +136,8 @@ def upload_files():
         if len(files) == 0:
             session["upload_message"] = "No files selected."
             return redirect("/process", code=302)
+        if not os.path.exists(app.config['UPLOAD_FOLDER']):
+            os.makedirs(app.config['UPLOAD_FOLDER'])
         for (extension, file) in files:
             if not file or not file.filename:
                 empty_file_count += 1

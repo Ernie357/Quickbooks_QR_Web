@@ -52,8 +52,7 @@ class QRCodeHandler:
         print("Generating QR Codes...")
         if len(ids) <= 0:
             print("\nNo data found. No QR Codes to generate.")
-        script_path = get_full_script_dir()
-        full_target_dir = f"{script_path}\\{target_dir}"
+        full_target_dir = "qr_codes"
         if not os.path.exists(full_target_dir):
             os.makedirs(full_target_dir)
         for id in ids:

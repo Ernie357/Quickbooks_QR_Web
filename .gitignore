@@ -12,3 +12,4 @@ build/
 buil/main/
 *.exe
 uploads/
+*.zip

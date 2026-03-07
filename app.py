@@ -28,11 +28,14 @@ def process_data(access_token: str, realm_id: str):
         get_credentials(is_prod=is_prod)
         remove_files_with_ext(dir="qr_codes", ext=".png")
         remove_files_with_ext(dir="invoice_mail", ext=".docx")
-        os.remove("invoice_mail.zip")
+        if os.path.exists("invoice_mail.zip"):
+            os.remove("invoice_mail.zip")
         print("\n")
         excel_filename = get_filename_with_ext(UPLOAD_FOLDER, ".xlsx")
         docx_filename = get_filename_with_ext(UPLOAD_FOLDER, ".docx")
         csv_filename = get_filename_with_ext(UPLOAD_FOLDER, ".csv")
+        if excel_filename == "None" or docx_filename == "None" or csv_filename == "None":
+            raise Exception("No files to uploaded to process.")
         qh = QuickbooksInvoiceHandler(realm_id=realm_id, access_token=access_token, is_prod=is_prod)
         qr = QRCodeHandler(is_prod=is_prod)
         excel = ExcelHandler(
@@ -62,7 +65,7 @@ def process_data(access_token: str, realm_id: str):
         zip_all_dir_files("invoice_mail", "invoice_mail")
         session["process_message"] = "Data Successfully Processed."
     except Exception as e:
-        session["process_message"] = e
+        session["process_message"] = str(e)
 
 @app.errorhandler(404)
 def page_not_found(_):
@@ -163,7 +166,7 @@ def download_files():
         download_folder = "invoice_mail.zip" if download_type == "invoice_mail" else "qr_codes.zip"
         return send_file(path_or_file=download_folder, as_attachment=True)
     except Exception as e:
-        session["download_message"] = e
+        session["download_message"] = str(e)
         return redirect("/process", code=302)
 
 if __name__ == '__main__':

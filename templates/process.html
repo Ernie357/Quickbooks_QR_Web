@@ -57,6 +57,16 @@
             width: 500px;
         }
     </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.getElementById("process-btn") 
+            btn.addEventListener("click", () => {
+                btn.innerHTML = "Processing...";
+                btn.style.cursor = "auto";
+                setTimeout(() => btn.disabled = true, 0);
+            });
+        });
+    </script>
 </head>
 <body>
     <h1>Processing Dashboard</h1>
@@ -87,7 +97,7 @@
         </form>
     </div>
     <form method="POST" action="{{ url_for('process') }}">
-        <button type="submit">Process and Upload Data</button>
+        <button type="submit" id="process-btn">Process and Upload Data</button>
         {% if process_message %}
             <p>{{ process_message }}</p>
         {% endif %}
@@ -97,5 +107,6 @@
             <button type="submit">Download Invoice Mail</button>
         </form>
     {% endif %}
+    <p><b>Note:&nbsp;</b>Please do not refresh the page while forms are submitting.</p>
 </body>
 </html>

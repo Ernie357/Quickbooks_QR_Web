@@ -43,7 +43,7 @@ def get_formatted_value(key: str, value: str):
         return dt.strftime("%#m/%#d/%Y")
     return value
 
-def get_credentials(is_prod) -> tuple[str, str]:
+def get_credentials(is_prod: bool) -> tuple[str, str]:
     proper_realm_id = os.getenv("PROD_REALM_ID" if is_prod else "DEV_REALM_ID")
     access_token = request.cookies.get('access_token')
     realm_id = request.cookies.get('realm_id')

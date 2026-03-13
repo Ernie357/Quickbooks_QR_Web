@@ -12,6 +12,10 @@ def get_full_script_dir():
         return os.path.dirname(sys.executable)
     return pathlib.Path(__file__).parent.resolve()
 
+def get_abs_path(dir_or_filename: str) -> str:
+    base = get_full_script_dir()
+    return os.path.join(base, dir_or_filename)
+
 merge_name_map = {
     "Inv_Nbr": column_index_from_string("G") - 1,
     "Estate_No": column_index_from_string("I") - 1,
@@ -47,11 +51,11 @@ def get_credentials(is_prod) -> tuple[str, str]:
         raise Exception("Unauthorized. If you are the intended user for this app, please contact the site admin.")
     return (access_token, realm_id)
 
-def get_filename_with_ext(dir: str, ext: str):
+def get_filename_with_ext(dir: str, ext: str, full: bool = True):
     if not os.path.exists(dir):
         return "None"
     for filename in glob.iglob(f"{dir}/*{ext}"):
-        return filename
+        return filename if not full else os.path.basename(filename)
     return "None"
 
 def get_all_dir_files(dir: str) -> list[str]:

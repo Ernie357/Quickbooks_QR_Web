@@ -10,10 +10,11 @@ from utils import get_full_script_dir
     Handles QRCode generation and holds program data about them and their links
 '''
 class QRCodeHandler:
-    def __init__(self, is_prod: bool):
+    def __init__(self, is_prod: bool, out_dir: str):
         self.code_paths: List[str] = []
         self.code_links: List[str] = []
         self.is_prod = is_prod
+        self.out_dir = out_dir
 
     ''' 
         Takes link to generate from and a filename to name the output,
@@ -44,25 +45,22 @@ class QRCodeHandler:
         target_dir must just be a name with no slashes or dots, like "qr_codes"
     '''
     def generate_qr_codes(
-            self, 
-            target_dir: str, 
+            self,  
             ids: List[int], 
             prod_link_function: Callable[[int], str]
         ):
         print("Generating QR Codes...")
         if len(ids) <= 0:
             print("\nNo data found. No QR Codes to generate.")
-        script_path = get_full_script_dir()
-        full_target_dir = os.path.join(script_path, target_dir)
-        if not os.path.exists(full_target_dir):
-            os.makedirs(full_target_dir)
+        if not os.path.exists(self.out_dir):
+            os.makedirs(self.out_dir)
         for id in ids:
             dev_link = f"https://app.qbo.intuit.com/app/invoice?txnId={id}"
             link = prod_link_function(id) if self.is_prod else dev_link
             print("QR Link:", link)
             filename = f"invoice_link_{id}.png"
             (img, _) = self.make_image_from_link(link, filename)
-            save_path = os.path.join(full_target_dir, filename)
+            save_path = os.path.join(self.out_dir, filename)
             self.save_img((img, save_path))
             self.code_links.append(link)
 

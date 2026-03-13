@@ -7,13 +7,13 @@ from AuthHandler import AuthHandler
 from flask import Flask, request, render_template, redirect, make_response, session, send_file
 from werkzeug.utils import secure_filename
 import os
-from utils import get_credentials, get_filename_with_ext, zip_all_dir_files, remove_files_with_ext
+from utils import get_credentials, get_filename_with_ext, zip_all_dir_files, remove_files_with_ext, get_abs_path
 from dotenv import load_dotenv
 
 load_dotenv()
 UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = get_abs_path(UPLOAD_FOLDER)
 app.secret_key = os.getenv("APP_SECRET_KEY")
 is_prod = False
 
@@ -26,30 +26,33 @@ def get_error_html(e: Exception) -> str:
 def process_data(access_token: str, realm_id: str):
     try:
         get_credentials(is_prod=is_prod)
-        remove_files_with_ext(dir="qr_codes", ext=".png")
-        remove_files_with_ext(dir="invoice_mail", ext=".docx")
-        if os.path.exists("invoice_mail.zip"):
-            os.remove("invoice_mail.zip")
-        print("\n")
-        excel_filename = get_filename_with_ext(UPLOAD_FOLDER, ".xlsx")
-        docx_filename = get_filename_with_ext(UPLOAD_FOLDER, ".docx")
-        csv_filename = get_filename_with_ext(UPLOAD_FOLDER, ".csv")
+        excel_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".xlsx")
+        docx_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".docx")
+        csv_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".csv")
         if excel_filename == "None" or docx_filename == "None" or csv_filename == "None":
             raise Exception("No files to uploaded to process.")
+        abs_qr_path = get_abs_path("qr_codes")
+        abs_invoice_path = get_abs_path("invoice_mail")
+        abs_zip_path = get_abs_path("invoice_mail.zip")
+        remove_files_with_ext(dir=abs_qr_path, ext=".png")
+        remove_files_with_ext(dir=abs_invoice_path, ext=".docx")
+        if os.path.exists(abs_zip_path):
+            os.remove(abs_zip_path)
+        print("\n")
         qh = QuickbooksInvoiceHandler(realm_id=realm_id, access_token=access_token, is_prod=is_prod)
-        qr = QRCodeHandler(is_prod=is_prod)
+        qr = QRCodeHandler(is_prod=is_prod, out_dir=abs_qr_path)
         excel = ExcelHandler(
             filename=excel_filename,
             worksheet_name="Bill&Cert"
         )
         print("\n")
-        mm = MailMergeHandler(template_filename=docx_filename)
+        mm = MailMergeHandler(template_filename=docx_filename, out_dir=abs_invoice_path)
         print("\n")
         qh.import_csv(filename=csv_filename)
         print(f"\nInvoice IDs: {qh.invoice_ids}")
         print(f"\nInvoice Numbers: {qh.invoice_numbers}")
         print("\n")
-        qr.generate_qr_codes(target_dir="qr_codes", ids=qh.invoice_ids, prod_link_function=qh.generate_invoice_link)
+        qr.generate_qr_codes(ids=qh.invoice_ids, prod_link_function=qh.generate_invoice_link)
         qr_path_data_to_add = CorrespondingData(col_name="X", data=qr.code_paths)
         qr_link_data_to_add = CorrespondingData(col_name="Y", data=qr.code_links)
         merge_data_list = qr.add_qrs_excel(
@@ -105,10 +108,11 @@ def process():
         if request.method == 'POST':
             process_data(access_token=access_token, realm_id=realm_id)
             return redirect("/process", code=302)
-        excel_filename = get_filename_with_ext(UPLOAD_FOLDER, ".xlsx").replace("uploads\\", "")
-        docx_filename = get_filename_with_ext(UPLOAD_FOLDER, ".docx").replace("uploads\\", "")
-        csv_filename = get_filename_with_ext(UPLOAD_FOLDER, ".csv").replace("uploads\\", "")
-        invoice_mail_exists = os.path.exists("invoice_mail.zip")
+        excel_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".xlsx", full=False)
+        docx_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".docx", full=False)
+        csv_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".csv", full=False)
+        abs_zip_path = get_abs_path("invoice_mail.zip")
+        invoice_mail_exists = os.path.exists(abs_zip_path)
         upload_message = session.pop("upload_message", None)
         process_message = session.pop("process_message", None)
         return render_template(
@@ -164,8 +168,7 @@ def upload_files():
 def download_files():
     try:
         get_credentials(is_prod=is_prod)
-        download_type = request.args.get('type')
-        download_folder = "invoice_mail.zip" if download_type == "invoice_mail" else "qr_codes.zip"
+        download_folder = get_abs_path("invoice_mail.zip")
         return send_file(path_or_file=download_folder, as_attachment=True)
     except Exception as e:
         session["download_message"] = str(e)

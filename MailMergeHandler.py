@@ -9,11 +9,12 @@ import os
     Handles Mail Merge operations, docx outputs, and image replacements
 '''
 class MailMergeHandler:
-    def __init__(self, template_filename: str):
+    def __init__(self, template_filename: str, out_dir: str):
         self.filename = template_filename
         print("Initializing Mail Merge Handler from file", self.filename)
         self.template_document = MailMerge(self.filename)
         self.no_doc_err = f"No template document found for {self.filename}"
+        self.out_dir = out_dir
 
     ''' Closes the template doc, DO THIS AFTER DONE WITH OBJECT '''
     def close(self):
@@ -46,12 +47,9 @@ class MailMergeHandler:
         print("\nInitiating Merge for invoice #", id, "...")
         image = str(merge_data.pop("QR_Image"))
         self.template_document.merge(**merge_data)
-        out_dir = "invoice_mail"
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
-        script_path = get_full_script_dir()
-        full_target_dir = os.path.join(script_path, out_dir)
-        out_file = os.path.join(full_target_dir, f"invoice_{id}.docx")
+        if not os.path.exists(self.out_dir):
+            os.makedirs(self.out_dir)
+        out_file = os.path.join(self.out_dir, f"invoice_{id}.docx")
         self.write_document_out(out_file=out_file)
         image_pairs = [("media/image4", image)]
         self.replace_images(doc_filename=out_file, image_pairs=image_pairs)

@@ -55,7 +55,7 @@ def get_filename_with_ext(dir: str, ext: str, full: bool = True):
     if not os.path.exists(dir):
         return "None"
     for filename in glob.iglob(f"{dir}/*{ext}"):
-        return filename if not full else os.path.basename(filename)
+        return filename if full else os.path.basename(filename)
     return "None"
 
 def get_all_dir_files(dir: str) -> list[str]:

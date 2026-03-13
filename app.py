@@ -15,7 +15,7 @@ UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = get_abs_path(UPLOAD_FOLDER)
 app.secret_key = os.getenv("APP_SECRET_KEY")
-is_prod = True
+is_prod = False
 
 def get_error_html(e: Exception) -> str:
     return f'''

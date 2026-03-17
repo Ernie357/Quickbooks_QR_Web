@@ -18,13 +18,14 @@ class QuickbooksInvoiceHandler():
         self.invoice_numbers: List[str] = []
 
     def get_item_ids(self):
-        url = f"{self.url_base}/v3/company/{self.realm_id}/query?query=SELECT * FROM Item"
+        url = f"{self.url_base}{self.realm_id}/query?minorversion=65"
+        query = "SELECT * FROM Item"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
             "Accept": "application/json",
             "Content-Type": "application/text"
         }
-        response = requests.get(url=url, headers=headers)
+        response = requests.post(url, headers=headers, data=query)
         print(response.json())
 
     ''' Takes customer DisplayName to check, returns their ID or -1 if not found '''

@@ -17,6 +17,16 @@ class QuickbooksInvoiceHandler():
         self.qr_code_paths: List[str] = []
         self.invoice_numbers: List[str] = []
 
+    def get_item_ids(self):
+        url = f"{self.url_base}/v3/company/{self.realm_id}/query?query=SELECT * FROM Item"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Accept": "application/json",
+            "Content-Type": "application/text"
+        }
+        response = requests.get(url=url, headers=headers)
+        print(response.json())
+
     ''' Takes customer DisplayName to check, returns their ID or -1 if not found '''
     def customer_exists(self, name: str) -> int:
         print("\nChecking to see if customer", name, "already exists...")

@@ -40,8 +40,6 @@ def process_data(access_token: str, realm_id: str):
             os.remove(abs_zip_path)
         print("\n")
         qh = QuickbooksInvoiceHandler(realm_id=realm_id, access_token=access_token, is_prod=is_prod)
-        qh.get_item_ids()
-        return
         qr = QRCodeHandler(is_prod=is_prod, out_dir=abs_qr_path)
         excel = ExcelHandler(
             filename=excel_filename,

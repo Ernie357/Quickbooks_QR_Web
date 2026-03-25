@@ -11,22 +11,12 @@ class QuickbooksInvoiceHandler():
     def __init__(self, realm_id: str, access_token: str, is_prod: bool):
         self.realm_id = realm_id
         self.access_token = access_token
-        self.url_base = "https://quickbooks.api.intuit.com/v3/company/" if is_prod else "https://sandbox-quickbooks.api.intuit.com/v3/company/"
+        self.is_prod= is_prod
+        self.url_base = "https://quickbooks.api.intuit.com/v3/company/" if self.is_prod else "https://sandbox-quickbooks.api.intuit.com/v3/company/"
         self.invoice_ids: List[int] = []
         self.invoice_urls: List[str] = []
         self.qr_code_paths: List[str] = []
         self.invoice_numbers: List[str] = []
-
-    def get_item_ids(self):
-        url = f"{self.url_base}{self.realm_id}/query?minorversion=65"
-        query = "SELECT * FROM Item"
-        headers = {
-            "Authorization": f"Bearer {self.access_token}",
-            "Accept": "application/json",
-            "Content-Type": "application/text"
-        }
-        response = requests.post(url, headers=headers, data=query)
-        print(response.json())
 
     ''' Takes customer DisplayName to check, returns their ID or -1 if not found '''
     def customer_exists(self, name: str) -> int:
@@ -93,7 +83,7 @@ class QuickbooksInvoiceHandler():
                     "SalesItemLineDetail": {
                         "ItemRef": {
                             "name": "Services", 
-                            "value": "1"
+                            "value": "189" if self.is_prod else "1"
                         }
                     }
                 }

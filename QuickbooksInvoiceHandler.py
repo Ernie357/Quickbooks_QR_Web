@@ -18,6 +18,20 @@ class QuickbooksInvoiceHandler():
         self.qr_code_paths: List[str] = []
         self.invoice_numbers: List[str] = []
 
+    def send_invoice(self, invoice_id: str):
+        print("Sending email for invoice ID", invoice_id)
+        url = f"{self.url_base}{self.realm_id}/invoice/{invoice_id}/send?sendTo=johnmasreglia32@gmail.com&minorversion=65"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Accept": "application/json",
+            "Content-Type": "application/octet-stream"
+        }
+        response = requests.post(url=url, headers=headers)
+        if response.status_code != 200:
+            err = f"Error sending email for invoice ID {invoice_id}"
+            print(err)
+            raise Exception(err)
+
     ''' Takes customer DisplayName to check, returns their ID or -1 if not found '''
     def customer_exists(self, name: str) -> int:
         print("\nChecking to see if customer", name, "already exists...")
@@ -97,6 +111,7 @@ class QuickbooksInvoiceHandler():
         if response.status_code == 200:
             data = response.json()
             invoice_id = data["Invoice"]["Id"]
+            self.send_invoice(invoice_id=invoice_id)
             print("Invoice successfully added. ID =", invoice_id)
             return int(invoice_id)
         else:

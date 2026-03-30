@@ -1,4 +1,4 @@
-from QuickbooksInvoiceHandler import QuickbooksInvoiceHandler
+from QuickbooksInvoiceHandler import QuickbooksInvoiceHandler, UnauthorizedException
 from QRCodeHandler import QRCodeHandler
 from ExcelHandler import ExcelHandler
 from ExcelHandler import CorrespondingData
@@ -67,6 +67,10 @@ def process_data(access_token: str, realm_id: str):
         print("\n")
         zip_all_dir_files("invoice_mail", "invoice_mail")
         session["process_message"] = "Data Successfully Processed."
+    except UnauthorizedException:
+        auth_handler = AuthHandler(is_prod=is_prod)
+        auth_url = auth_handler.get_auth_url()
+        return redirect(auth_url, code=302)
     except Exception as e:
         session["process_message"] = str(e)
 

@@ -3,6 +3,9 @@ import requests
 import datetime
 from typing import List
 
+class UnauthorizedException(Exception):
+    pass
+
 ''' 
     Takes the realm ID and relevant access token for an intuit developer account,
     gathers data from and interacts with the Quickbooks API
@@ -27,6 +30,9 @@ class QuickbooksInvoiceHandler():
             "Content-Type": "application/octet-stream"
         }
         response = requests.post(url=url, headers=headers)
+        if response.status_code == 401:
+            print("Refreshing Access Token...")
+            raise UnauthorizedException("Missing Access Token")
         if response.status_code != 200:
             err = f"Error sending email for invoice ID {invoice_id}"
             print(err)
@@ -43,6 +49,9 @@ class QuickbooksInvoiceHandler():
         }
         query = f"select * from Customer where DisplayName = '{name}'"
         response = requests.post(url, headers=headers, data=query)
+        if response.status_code == 401:
+            print("Refreshing Access Token...")
+            raise UnauthorizedException("Missing Access Token")
         if(response.status_code == 200):
             data = response.json()
             customer = data.get("QueryResponse", {}).get("Customer", [])
@@ -70,6 +79,9 @@ class QuickbooksInvoiceHandler():
         }
         url = f"{self.url_base}{self.realm_id}/customer?minorversion=65"
         response = requests.post(url=url, headers=headers, json=payload)
+        if response.status_code == 401:
+            print("Refreshing Access Token...")
+            raise UnauthorizedException("Missing Access Token")
         if response.status_code in (200, 201):
             data = response.json()
             customer_id = data["Customer"]["Id"]
@@ -108,6 +120,9 @@ class QuickbooksInvoiceHandler():
             "PrivateNote": inv["Memo"]
         }
         response = requests.post(url=url, headers=headers, json=payload)
+        if response.status_code == 401:
+            print("Refreshing Access Token...")
+            raise UnauthorizedException("Missing Access Token")
         if response.status_code == 200:
             data = response.json()
             invoice_id = data["Invoice"]["Id"]
@@ -146,6 +161,9 @@ class QuickbooksInvoiceHandler():
             "Accept": "application/json"
         }
         response = requests.get(url=url, headers=headers)
+        if response.status_code == 401:
+            print("Refreshing Access Token...")
+            raise UnauthorizedException("Missing Access Token")
         if response.status_code == 200:
             data = response.json()
             link = data.get("Invoice", {}).get("InvoiceLink", None)

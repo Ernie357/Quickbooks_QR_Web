@@ -88,8 +88,7 @@ class QuickbooksInvoiceHandler():
             print("Customer successfully added. ID =", customer_id)
             return int(customer_id)
         else:
-            print("Error adding customer: ", response.status_code, response.text)
-            return -1
+            raise Exception("Error adding customer: ", response.status_code, response.text)
         
     ''' Takes invoice data and corresponding customer ID, returns uploaded invoice ID '''
     def upload_invoice(self, inv, customer_id: int) -> int:
@@ -131,9 +130,7 @@ class QuickbooksInvoiceHandler():
             print("Invoice successfully added. ID =", invoice_id)
             return int(invoice_id)
         else:
-            print(response.status_code)
-            print("Error adding invoice: ", response.status_code, response.text)
-            return -1
+            raise Exception("Error adding invoice: ", response.status_code, response.text)
 
     ''' Loads invoice IDs and numbers into this object from {filename} CSV '''
     def import_csv(self, filename: str):
@@ -169,10 +166,8 @@ class QuickbooksInvoiceHandler():
             data = response.json()
             link = data.get("Invoice", {}).get("InvoiceLink", None)
             if link is None:
-                print("Could not find invoice link for ID", id)
-                return ""
+                raise Exception("Could not find invoice link for ID", id)
             print("Invoice Link:", link)
             return link
         else:
-            print("Error generating invoice link for ID", id)
-            return ""
+            raise Exception("Error generating invoice link for ID", id)

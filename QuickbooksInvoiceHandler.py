@@ -114,6 +114,7 @@ class QuickbooksInvoiceHandler():
                     }
                 }
             ],
+            "DocNumber": inv["*InvoiceNo"],
             "TxnDate": datetime.datetime.strptime(inv["*InvoiceDate"], "%m/%d/%y").strftime("%Y-%m-%d"),
             "CustomerRef": {"name": inv["*Customer"], "value": customer_id},
             "DueDate": datetime.datetime.strptime(inv["*DueDate"], "%m/%d/%y").strftime("%Y-%m-%d"),

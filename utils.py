@@ -65,7 +65,7 @@ def zip_all_dir_files(dir: str, output_zip: str):
     shutil.make_archive(output_zip, 'zip', dir)
 
 def remove_files_with_ext(dir: str, ext: str):
-    if not os.path.exists(dir) or len(os.listdir(dir)) == 0:
+    if not os.path.exists(dir):
         return
     for filename in glob.iglob(f"{dir}/*{ext}"):
         os.remove(filename)

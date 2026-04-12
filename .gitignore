@@ -13,3 +13,4 @@ uploads/
 *.zip
 qr_codes/
 invoice_mail/
+*.ini

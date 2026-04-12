@@ -9,13 +9,14 @@ from werkzeug.utils import secure_filename
 import os
 from utils import get_credentials, get_filename_with_ext, zip_all_dir_files, remove_files_with_ext, get_abs_path
 from dotenv import load_dotenv
+from Config import Config, update_config
 
 load_dotenv()
 UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = get_abs_path(UPLOAD_FOLDER)
 app.secret_key = os.getenv("APP_SECRET_KEY")
-is_prod = True
+is_prod = False
 
 def get_error_html(e: Exception) -> str:
     return f'''
@@ -30,7 +31,7 @@ def process_data(access_token: str, realm_id: str):
         docx_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".docx")
         csv_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".csv")
         if excel_filename == "None" or docx_filename == "None" or csv_filename == "None":
-            raise Exception("No files to uploaded to process.")
+            raise Exception("Required files for processing are missing.")
         abs_qr_path = get_abs_path("qr_codes")
         abs_invoice_path = get_abs_path("invoice_mail")
         abs_zip_path = get_abs_path("invoice_mail.zip")
@@ -112,6 +113,7 @@ def process():
         if request.method == 'POST':
             process_data(access_token=access_token, realm_id=realm_id)
             return redirect("/process", code=302)
+        config = Config('config.ini')
         excel_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".xlsx", full=False)
         docx_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".docx", full=False)
         csv_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".csv", full=False)
@@ -126,7 +128,8 @@ def process():
             csv_filename=csv_filename,
             upload_message=upload_message,
             process_message=process_message,
-            mail_to_download=invoice_mail_exists
+            mail_to_download=invoice_mail_exists,
+            config=config
         )
     except Exception as e:
         print(f"Error in /process: {e}")
@@ -176,6 +179,17 @@ def download_files():
         return send_file(path_or_file=download_folder, as_attachment=True)
     except Exception as e:
         session["download_message"] = str(e)
+        return redirect("/process", code=302)
+
+@app.route('/config/excel', methods=['POST'])
+def edit_excel_config():
+    try:
+        get_credentials(is_prod=is_prod)
+        data = request.form
+        update_config(section="Excel", form=data, out_filename="config.ini")
+        return redirect("/process", code=302)
+    except Exception as e:
+        session["config_message"] = str(e)
         return redirect("/process", code=302)
 
 if __name__ == '__main__':

@@ -107,6 +107,17 @@
             <button type="submit">Download Invoice Mail</button>
         </form>
     {% endif %}
+    <form method="POST" action="{{ url_for('config/excel') }}">
+        <div>
+            <label>Excel Worksheet Name</label>
+            <input type="text" name="worksheet_name" value="{{ config['excel_worksheet_name'] }}" />
+        </div>
+        <!--<div>
+            <label>Invoice Number Column</label>
+            <input type="text" name="excel_inv_no" placeholder="{{ config['excel_inv_no'] }}" />
+        </div> -->
+        <button type="submit">Update Excel Settings</button>
+    </form>
     <p><b>Note:&nbsp;</b>Please do not refresh the page while forms are submitting.</p>
 </body>
 </html>

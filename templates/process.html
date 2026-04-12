@@ -118,6 +118,13 @@
         </div> -->
         <button type="submit">Update Excel Settings</button>
     </form>
+    <form method="POST" action="{{ url_for('config/csv') }}">
+        <div>
+            <label>Inv # Column Name</label>
+            <input type="text" name="invoice_number_name" value="{{ config['csv_invoice_number_name'] }}" />
+        </div>
+        <button type="submit">Update CSV Settings</button>
+    </form>
     <p><b>Note:&nbsp;</b>Please do not refresh the page while forms are submitting.</p>
 </body>
 </html>

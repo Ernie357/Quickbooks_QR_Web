@@ -191,6 +191,17 @@ def edit_excel_config():
     except Exception as e:
         session["config_message"] = str(e)
         return redirect("/process", code=302)
+    
+@app.route('/config/csv', methods=['POST'])
+def edit_csv_config():
+    try:
+        get_credentials(is_prod=is_prod)
+        data = request.form
+        update_config(section="CSV", form=data, out_filename="config.ini")
+        return redirect("/process", code=302)
+    except Exception as e:
+        session["config_message"] = str(e)
+        return redirect("/process", code=302)
 
 if __name__ == '__main__':
     app.run(debug=True)

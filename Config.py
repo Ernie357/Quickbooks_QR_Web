@@ -5,7 +5,8 @@ class Config:
     def __init__(self, config_filename: str):
         config = configparser.ConfigParser()
         config.read(config_filename)
-        self.excel_worksheet_name = config.get('excel', 'worksheet_name')
+        self.excel_worksheet_name = config.get('excel', 'worksheet_name', fallback="")
+        self.csv_invoice_number_name = config.get('csv', 'invoice_number_name', fallback="")
 
 def update_config(section: str, form: ImmutableMultiDict, out_filename: str):
     config = configparser.ConfigParser()

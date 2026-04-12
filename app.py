@@ -129,7 +129,8 @@ def process():
             upload_message=upload_message,
             process_message=process_message,
             mail_to_download=invoice_mail_exists,
-            config=config
+            excel_config=config.excel,
+            csv_config=config.csv
         )
     except Exception as e:
         print(f"Error in /process: {e}")

@@ -27,6 +27,9 @@ def get_error_html(e: Exception) -> str:
 def process_data(access_token: str, realm_id: str):
     try:
         get_credentials(is_prod=is_prod)
+        config = Config("config.ini")
+        if not config.validate():
+            raise Exception("One or more config settings are empty, or a letter input is more than 1 character.")
         excel_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".xlsx")
         docx_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".docx")
         csv_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".csv")

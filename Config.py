@@ -8,6 +8,19 @@ class Config:
         self.excel = dict(config['Excel']) if 'Excel' in config else {}
         self.csv = dict(config['CSV']) if 'CSV' in config else {}
 
+    def validate(self):
+        for k in self.excel.keys():
+            v = self.excel[k]
+            if v is None or v == '':
+                return False 
+            if 'letter' in k and len(v) > 1:
+                return False
+        for k in self.csv.keys():
+            v = self.csv[k]
+            if v is None or v == '':
+                return False
+        return True
+
 def update_config(section: str, form: ImmutableMultiDict, out_filename: str):
     config = configparser.ConfigParser()
     config[section] = form

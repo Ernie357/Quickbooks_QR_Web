@@ -116,6 +116,9 @@
             <button type="submit">Download Invoice Mail</button>
         </form>
     {% endif %}
+    <p>The configuration forms below should be used if there is any change in Excel or CSV structure.</p>
+    <br>
+    <p>The input values will be used by the app to read the files and process the data.</p>
     <form method="POST" action="{{ url_for('edit_excel_config') }}" class="config-form">
         <div>
             <label>Excel Worksheet Name</label>

@@ -2,6 +2,10 @@ import configparser
 from werkzeug.datastructures import ImmutableMultiDict
 from typing import Literal
 
+# The below field dicts outline the form input names and form labels as key, value respectively.
+# The form input names also access the ini config data to ensure consistency.
+# Essentially, these dicts are the single source of truth for how the data is structured and accessed.
+
 ExcelFieldKey = Literal[
     'worksheet_name',
     'invoice_number_name',
@@ -88,6 +92,10 @@ mail_merge_map: dict[ExcelFieldKey, MailMergeKey] = {
 merge_id_key: MailMergeKey = 'Inv_Nbr'
 qr_image_key: MailMergeKey = 'QR_Image'
 
+''' 
+    This class holds ini config data in Python memory, ensuring it matches the structures above.
+    This allows for the identification of Excel and CSV columns to be changed programmatically.
+'''
 class Config:
     def __init__(self, config_filename: str):
         config = configparser.ConfigParser()

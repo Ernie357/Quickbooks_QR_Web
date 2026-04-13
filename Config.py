@@ -56,7 +56,7 @@ csv_fields: dict[CsvFieldKey, str] = {
 
 # alt+F9 in the template docx to see the fields
 MailMergeKey = Literal[
-    'INV_NBR',
+    'Inv_Nbr',
     'Estate_No',
     'Bill_To',
     'Address_1',
@@ -71,7 +71,7 @@ MailMergeKey = Literal[
 ]
 
 mail_merge_map: dict[ExcelFieldKey, MailMergeKey] = {
-    'invoice_number_name': 'INV_NBR',
+    'invoice_number_name': 'Inv_Nbr',
     'estate_number_name': 'Estate_No',
     'bill_to_name': 'Bill_To',
     'address_1_name': 'Address_1',
@@ -85,7 +85,7 @@ mail_merge_map: dict[ExcelFieldKey, MailMergeKey] = {
     'qr_link_name': 'QR_Link'
 }
 
-merge_id_key: MailMergeKey = 'INV_NBR'
+merge_id_key: MailMergeKey = 'Inv_Nbr'
 qr_image_key: MailMergeKey = 'QR_Image'
 
 class Config:

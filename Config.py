@@ -19,6 +19,7 @@ ExcelFieldKey = Literal[
 ]
 
 merge_id_key: ExcelFieldKey = 'invoice_number_name'
+qr_image_key: ExcelFieldKey = "qr_image_name"
 
 excel_fields: dict[ExcelFieldKey, str] = {
     'worksheet_name': 'Excel Worksheet Name',

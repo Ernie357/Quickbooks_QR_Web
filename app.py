@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 import os
 from utils import get_credentials, get_filename_with_ext, zip_all_dir_files, remove_files_with_ext, get_abs_path
 from dotenv import load_dotenv
-from Config import Config, update_config
+from Config import Config, update_config, excel_fields, csv_fields
 
 load_dotenv()
 UPLOAD_FOLDER = 'uploads'
@@ -28,8 +28,7 @@ def process_data(access_token: str, realm_id: str):
     try:
         get_credentials(is_prod=is_prod)
         config = Config("config.ini")
-        if not config.validate():
-            raise Exception("One or more config settings are empty, or a letter input is more than 1 character.")
+        config.validate()
         excel_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".xlsx")
         docx_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".docx")
         csv_filename = get_filename_with_ext(dir=app.config["UPLOAD_FOLDER"], ext=".csv")
@@ -43,11 +42,12 @@ def process_data(access_token: str, realm_id: str):
         if os.path.exists(abs_zip_path):
             os.remove(abs_zip_path)
         print("\n")
-        qh = QuickbooksInvoiceHandler(realm_id=realm_id, access_token=access_token, is_prod=is_prod)
+        qh = QuickbooksInvoiceHandler(realm_id=realm_id, access_token=access_token, is_prod=is_prod, config=config)
         qr = QRCodeHandler(is_prod=is_prod, out_dir=abs_qr_path)
         excel = ExcelHandler(
             filename=excel_filename,
-            worksheet_name="Bill&Cert"
+            worksheet_name="Bill&Cert",
+            config=config
         )
         print("\n")
         mm = MailMergeHandler(template_filename=docx_filename, out_dir=abs_invoice_path)
@@ -132,8 +132,9 @@ def process():
             upload_message=upload_message,
             process_message=process_message,
             mail_to_download=invoice_mail_exists,
-            excel_config=config.excel,
-            csv_config=config.csv
+            excel_fields=excel_fields,
+            csv_fields=csv_fields,
+            config=config
         )
     except Exception as e:
         print(f"Error in /process: {e}")

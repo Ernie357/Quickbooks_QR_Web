@@ -1,6 +1,6 @@
 from mailmerge import MailMerge
 from docx import Document
-from utils import get_full_script_dir, merge_id_key
+from Config import merge_id_key
 from typing import List
 import os
 

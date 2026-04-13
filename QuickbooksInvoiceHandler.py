@@ -2,6 +2,7 @@ import csv
 import requests
 import datetime
 from typing import List
+from Config import Config
 
 class UnauthorizedException(Exception):
     pass
@@ -11,10 +12,11 @@ class UnauthorizedException(Exception):
     gathers data from and interacts with the Quickbooks API
 '''
 class QuickbooksInvoiceHandler():
-    def __init__(self, realm_id: str, access_token: str, is_prod: bool):
+    def __init__(self, realm_id: str, access_token: str, is_prod: bool, config: Config):
         self.realm_id = realm_id
         self.access_token = access_token
         self.is_prod= is_prod
+        self.config = config
         self.url_base = "https://quickbooks.api.intuit.com/v3/company/" if self.is_prod else "https://sandbox-quickbooks.api.intuit.com/v3/company/"
         self.invoice_ids: List[int] = []
         self.invoice_urls: List[str] = []
@@ -103,8 +105,8 @@ class QuickbooksInvoiceHandler():
             "Line": [
                 {
                     "DetailType": "SalesItemLineDetail", 
-                    "Amount": float(inv["*ItemAmount"]),
-                    "Description": inv["ItemDescription"],
+                    "Amount": float(inv[self.config.get_csv_config('item_amount_name')]),
+                    "Description": inv[self.config.get_csv_config('item_description_name')],
                     "SalesItemLineDetail": {
                         "ItemRef": {
                             "name": "Services", 
@@ -113,11 +115,11 @@ class QuickbooksInvoiceHandler():
                     }
                 }
             ],
-            "DocNumber": inv["*InvoiceNo"],
-            "TxnDate": datetime.datetime.strptime(inv["*InvoiceDate"], "%m/%d/%y").strftime("%Y-%m-%d"),
-            "CustomerRef": {"name": inv["*Customer"], "value": customer_id},
-            "DueDate": datetime.datetime.strptime(inv["*DueDate"], "%m/%d/%y").strftime("%Y-%m-%d"),
-            "PrivateNote": inv["Memo"]
+            "DocNumber": inv[self.config.get_csv_config('invoice_number_name')],
+            "TxnDate": datetime.datetime.strptime(inv[self.config.get_csv_config('invoice_date_name')], "%m/%d/%y").strftime("%Y-%m-%d"),
+            "CustomerRef": {"name": inv[self.config.get_csv_config('customer_name')], "value": customer_id},
+            "DueDate": datetime.datetime.strptime(inv[self.config.get_csv_config('due_date_name')], "%m/%d/%y").strftime("%Y-%m-%d"),
+            "PrivateNote": inv[self.config.get_csv_config('memo_name')]
         }
         response = requests.post(url=url, headers=headers, json=payload)
         if response.status_code == 401:

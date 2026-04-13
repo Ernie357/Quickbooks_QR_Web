@@ -2,7 +2,8 @@ from openpyxl import load_workbook
 from openpyxl.utils import column_index_from_string
 from openpyxl.cell import Cell, MergedCell
 from typing import List, Callable
-from utils import merge_name_map, get_formatted_value
+from utils import get_formatted_value
+from Config import Config
 
 class CorrespondingData:
     def __init__(self, col_name: str, data: List[str]):
@@ -17,12 +18,13 @@ class CorrespondingData:
     performs read and write operations on that Excel file
 '''
 class ExcelHandler:
-    def __init__(self, filename: str, worksheet_name: str | None = None):
+    def __init__(self, filename: str, config: Config, worksheet_name: str | None = None, ):
         print("Initializing Excel Workbook", filename)
         self.filename = filename
         self.wb = load_workbook(filename=self.filename, data_only=True)
         self.ws = self.wb.active if worksheet_name is None else self.wb[worksheet_name]
         self.no_ws_err = f"No Worksheet found for {self.filename}"
+        self.config = config
 
     ''' Adds data to cell in string format {col_letter}{row_number} '''
     def add_data_to_cell(self, data: str, cell: str):
@@ -54,9 +56,10 @@ class ExcelHandler:
         if self.ws is None:
             raise Exception(self.no_ws_err)
         row_values = [cell.value for cell in self.ws[row_num]]
-        keys = merge_name_map.keys()
-        values = merge_name_map.values()
-        zipped = zip(keys, values)
+        keys = self.config.excel_config.keys()
+        values = list(self.config.excel_config.values())
+        column_idxs = [column_index_from_string(v) - 1 for v in values]
+        zipped = zip(keys, column_idxs)
         return { k: get_formatted_value(key=k, value=str(row_values[v])) for (k,v) in zipped }
 
     '''

@@ -131,89 +131,29 @@
         <p>The input values will be used by the app to read the files and process the data.</p>
     </div>
     <form method="POST" action="{{ url_for('edit_excel_config') }}" class="config-form">
-        <div>
-            <label>Excel Worksheet Name</label>
-            <input type="text" name="worksheet_name" value="{{ excel_config.get('worksheet_name', '') }}" />
-        </div>
-        <div>
-            <label>Invoice # Column Letter</label>
-            <input type="text" name="invoice_number_name" value="{{ excel_config.get('invoice_number_name', '') }}" />
-        </div>
-        <div>
-            <label>Estate # Column Letter</label>
-            <input type="text" name="estate_number_name" value="{{ excel_config.get('estate_number_name', '') }}" />
-        </div>
-        <div>
-            <label>Bill_To Column Letter</label>
-            <input type="text" name="bill_to_name" value="{{ excel_config.get('bill_to_name', '') }}" />
-        </div>
-        <div>
-            <label>Address 1 Column Letter</label>
-            <input type="text" name="address_1_name" value="{{ excel_config.get('address_1_name', '') }}" />
-        </div>
-        <div>
-            <label>Address 2 Column Letter</label>
-            <input type="text" name="address_2_name" value="{{ excel_config.get('address_2_name', '') }}" />
-        </div>
-                <div>
-            <label>Estate Of Column Letter</label>
-            <input type="text" name="estate_of_name" value="{{ excel_config.get('estate_of_name', '') }}" />
-        </div>
-        <div>
-            <label>1st Run Column Letter</label>
-            <input type="text" name="1st_run_name" value="{{ excel_config.get('1st_run_name', '') }}" />
-        </div>
-        <div>
-            <label>2nd Run Column Letter</label>
-            <input type="text" name="2nd_run_name" value="{{ excel_config.get('2nd_run_name', '') }}" />
-        </div>
-        <div>
-            <label>3rd Run Column Letter</label>
-            <input type="text" name="3rd_run_name" value="{{ excel_config.get('3rd_run_name', '') }}" />
-        </div>
-        <div>
-            <label>Price Column Letter</label>
-            <input type="text" name="price_name" value="{{ excel_config.get('price_name', '') }}" />
-        </div>
-        <div>
-            <label>QR Image Column Letter</label>
-            <input type="text" name="qr_image_name" value="{{ excel_config.get('qr_image_name', '') }}" />
-        </div>
-        <div>
-            <label>QR Link Column Letter</label>
-            <input type="text" name="qr_link_name" value="{{ excel_config.get('qr_link_name', '') }}" />
-        </div>
+        {% for key, label in excel_fields.items() %}
+            <div>
+                <label>{{ label }}</label>
+                <input
+                    type="text"
+                    name="{{ key }}"
+                    value="{{ config.excel_config.get(key, '') }}"
+                />
+            </div>
+        {% endfor %}
         <button type="submit">Update Excel Settings</button>
     </form>
     <form method="POST" action="{{ url_for('edit_csv_config') }}" class="config-form">
-        <div>
-            <label>Inv # Column Name</label>
-            <input type="text" name="invoice_number_name" value="{{ csv_config.get('invoice_number_name', '') }}" />
-        </div>
-        <div>
-            <label>Customer Column Name</label>
-            <input type="text" name="customer_name" value="{{ csv_config.get('customer_name', '') }}" />
-        </div>
-        <div>
-            <label>Inv Date Column Name</label>
-            <input type="text" name="invoice_date_name" value="{{ csv_config.get('invoice_date_name', '') }}" />
-        </div>
-        <div>
-            <label>Due Date Column Name</label>
-            <input type="text" name="due_date_name" value="{{ csv_config.get('due_date_name', '') }}" />
-        </div>
-        <div>
-            <label>Memo Column Name</label>
-            <input type="text" name="memo_name" value="{{ csv_config.get('memo_name', '') }}" />
-        </div>
-                <div>
-            <label>Item Amount Column Name</label>
-            <input type="text" name="item_amount_name" value="{{ csv_config.get('item_amount_name', '') }}" />
-        </div>
-        <div>
-            <label>Item Description Column Name</label>
-            <input type="text" name="item_description_name" value="{{ csv_config.get('item_description_name', '') }}" />
-        </div>
+        {% for key, label in csv_fields.items() %}
+            <div>
+                <label>{{ label }}</label>
+                <input
+                    type="text"
+                    name="{{ key }}"
+                    value="{{ config.csv_config.get(key, '') }}"
+                />
+            </div>
+        {% endfor %}
         <button type="submit">Update CSV Settings</button>
     </form>
     <p><b>Note:&nbsp;</b>Please do not refresh the page while forms are submitting.</p>

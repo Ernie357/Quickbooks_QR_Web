@@ -1,9 +1,9 @@
 from openpyxl import load_workbook
 from openpyxl.utils import column_index_from_string
 from openpyxl.cell import Cell, MergedCell
-from typing import List, Callable
+from typing import List, Callable, get_args
 from utils import get_formatted_value
-from Config import Config
+from Config import Config, mail_merge_map, ExcelFieldKey
 
 class CorrespondingData:
     def __init__(self, col_name: str, data: List[str]):
@@ -50,18 +50,18 @@ class ExcelHandler:
 
     '''
         Using row #, returns a dictionary that can be used with Mail Merge API
-        The returned dictionary is based off merge_name_map in utils.py
+        The returned dictionary is based off excel_config in Config.py
     '''
     def get_merge_data_from_row(self, row_num: int) -> dict[str, str | float | dict]:
         if self.ws is None:
             raise Exception(self.no_ws_err)
         row_values = [cell.value for cell in self.ws[row_num]]
-        filtered = { k:v for k,v in self.config.excel_config.items() if v.isalpha() and len(v) == 1 }
+        filtered: dict[ExcelFieldKey, str] = { k:v for k,v in self.config.excel_config.items() if v.isalpha() and len(v) == 1 and k in get_args(ExcelFieldKey) } # type: ignore
         keys = filtered.keys()
         values = filtered.values()
         column_idxs = [column_index_from_string(v) - 1 for v in values]
         zipped = zip(keys, column_idxs)
-        return { k: get_formatted_value(key=k, value=str(row_values[v])) for (k,v) in zipped }
+        return { mail_merge_map[k]: get_formatted_value(key=k, value=str(row_values[v])) for (k,v) in zipped }
 
     '''
         Purpose: Perform operations on specific rows filtered by IDs

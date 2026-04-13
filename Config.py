@@ -57,6 +57,37 @@ csv_fields: dict[CsvFieldKey, str] = {
     'item_description_name': 'Item Description Column Name'
 }
 
+# alt+F9 in the template docx to see the fields
+MailMergeKey = Literal[
+    'INV_NBR',
+    'Estate_No',
+    'Bill_To',
+    'Address_1',
+    'Address_2',
+    'Estate_Of',
+    'M_1st_Run',
+    'M_2nd_Run',
+    'M_3rd_Run',
+    'price',
+    'QR_Image',
+    'QR_Link'
+]
+
+mail_merge_map: dict[ExcelFieldKey, MailMergeKey] = {
+    'invoice_number_name': 'INV_NBR',
+    'estate_number_name': 'Estate_No',
+    'bill_to_name': 'Bill_To',
+    'address_1_name': 'Address_1',
+    'address_2_name': 'Address_2',
+    'estate_of_name': 'Estate_Of',
+    '1st_run_name': 'M_1st_Run',
+    '2nd_run_name': 'M_2nd_Run',
+    '3rd_run_name': 'M_3rd_Run',
+    'price_name': 'price',
+    'qr_image_name': 'QR_Image',
+    'qr_link_name': 'QR_Link'
+}
+
 class Config:
     def __init__(self, config_filename: str):
         config = configparser.ConfigParser()

@@ -18,9 +18,6 @@ ExcelFieldKey = Literal[
     'qr_link_name',
 ]
 
-merge_id_key: ExcelFieldKey = 'invoice_number_name'
-qr_image_key: ExcelFieldKey = "qr_image_name"
-
 excel_fields: dict[ExcelFieldKey, str] = {
     'worksheet_name': 'Excel Worksheet Name',
     'invoice_number_name': 'Invoice # Column Letter',
@@ -87,6 +84,9 @@ mail_merge_map: dict[ExcelFieldKey, MailMergeKey] = {
     'qr_image_name': 'QR_Image',
     'qr_link_name': 'QR_Link'
 }
+
+merge_id_key: MailMergeKey = 'INV_NBR'
+qr_image_key: MailMergeKey = 'QR_Image'
 
 class Config:
     def __init__(self, config_filename: str):

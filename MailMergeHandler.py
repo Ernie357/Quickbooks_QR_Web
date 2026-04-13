@@ -62,7 +62,6 @@ class MailMergeHandler:
         if self.template_document is None:
             raise Exception(self.no_doc_err)
         for merge_data in merge_data_list:
-            print(merge_data)
             self.initate_merge(merge_data=merge_data, id=merge_data[merge_id_key], image_key=qr_image_key)
 
     '''

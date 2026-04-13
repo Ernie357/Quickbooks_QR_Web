@@ -41,7 +41,7 @@ class MailMergeHandler:
             distinguish each result; MUST match one of the keys of the
             excel config in Config.py, currently invoice_number_name
     '''
-    def initate_merge(self, merge_data, id_key: str, image_key: str):
+    def initate_merge(self, merge_data, id: str, image_key: str):
         if self.template_document is None:
             raise Exception(self.no_doc_err)
         print("\nInitiating Merge for invoice #", id, "...")
@@ -49,7 +49,7 @@ class MailMergeHandler:
         self.template_document.merge(**merge_data)
         if not os.path.exists(self.out_dir):
             os.makedirs(self.out_dir)
-        out_file = os.path.join(self.out_dir, f"invoice_{id_key}.docx")
+        out_file = os.path.join(self.out_dir, f"invoice_{id}.docx")
         self.write_document_out(out_file=out_file)
         image_pairs = [("media/image4", image)]
         self.replace_images(doc_filename=out_file, image_pairs=image_pairs)
@@ -62,7 +62,8 @@ class MailMergeHandler:
         if self.template_document is None:
             raise Exception(self.no_doc_err)
         for merge_data in merge_data_list:
-            self.initate_merge(merge_data=merge_data, id_key=merge_data[merge_id_key], image_key=qr_image_key)
+            print(merge_data)
+            self.initate_merge(merge_data=merge_data, id=merge_data[merge_id_key], image_key=qr_image_key)
 
     '''
         Writes the filled out template file results to out_file

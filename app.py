@@ -10,6 +10,7 @@ import os
 from utils import get_credentials, get_filename_with_ext, zip_all_dir_files, remove_files_with_ext, get_abs_path
 from dotenv import load_dotenv
 from Config import Config, update_config, excel_fields, csv_fields
+import traceback
 
 load_dotenv()
 UPLOAD_FOLDER = 'uploads'
@@ -58,6 +59,7 @@ def process_data(access_token: str, realm_id: str):
         qr.generate_qr_codes(ids=qh.invoice_ids, prod_link_function=qh.generate_invoice_link)
         qr_path_data_to_add = CorrespondingData(col_name=config.get_excel_config('qr_image_name'), data=qr.code_paths)
         qr_link_data_to_add = CorrespondingData(col_name=config.get_excel_config('qr_link_name'), data=qr.code_links)
+        print(config.excel_config)
         merge_data_list = qr.add_qrs_excel(
             excel=excel,
             invoice_num_col_name=config.get_excel_config('invoice_number_name'),
@@ -75,6 +77,7 @@ def process_data(access_token: str, realm_id: str):
         auth_url = auth_handler.get_auth_url()
         return redirect(auth_url, code=302)
     except Exception as e:
+        print(traceback.format_exc())
         session["process_message"] = str(e)
 
 @app.errorhandler(404)

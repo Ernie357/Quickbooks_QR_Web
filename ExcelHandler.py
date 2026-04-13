@@ -57,6 +57,9 @@ class ExcelHandler:
             raise Exception(self.no_ws_err)
         row_values = [cell.value for cell in self.ws[row_num]]
         filtered: dict[ExcelFieldKey, str] = { k:v for k,v in self.config.excel_config.items() if v.isalpha() and len(v) == 1 and k in get_args(ExcelFieldKey) } # type: ignore
+        print("config keys:", list(self.config.excel_config.keys()))
+        print("ExcelFieldKey args:", get_args(ExcelFieldKey))
+        print(filtered)
         keys = filtered.keys()
         values = filtered.values()
         column_idxs = [column_index_from_string(v) - 1 for v in values]

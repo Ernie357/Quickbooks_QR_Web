@@ -2,9 +2,6 @@ import configparser
 from werkzeug.datastructures import ImmutableMultiDict
 from typing import Literal
 
-
-# config.excel[excel_fields['worksheet_name']['config_name']]
-
 ExcelFieldKey = Literal[
     'worksheet_name',
     'invoice_number_name',
@@ -117,9 +114,9 @@ class Config:
             raise Exception(f"Error: Invalid field - {key}")
         return result 
 
-
 def update_config(section: str, form: ImmutableMultiDict, out_filename: str):
     config = configparser.ConfigParser()
+    config.read(out_filename)
     config[section] = form
     with open(out_filename, 'w') as configfile:
         config.write(configfile)

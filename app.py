@@ -46,7 +46,6 @@ def process_data(access_token: str, realm_id: str):
         qr = QRCodeHandler(is_prod=is_prod, out_dir=abs_qr_path)
         excel = ExcelHandler(
             filename=excel_filename,
-            worksheet_name="Bill&Cert",
             config=config
         )
         print("\n")

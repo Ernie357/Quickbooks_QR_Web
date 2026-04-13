@@ -18,11 +18,11 @@ class CorrespondingData:
     performs read and write operations on that Excel file
 '''
 class ExcelHandler:
-    def __init__(self, filename: str, config: Config, worksheet_name: str | None = None, ):
+    def __init__(self, filename: str, config: Config):
         print("Initializing Excel Workbook", filename)
         self.filename = filename
         self.wb = load_workbook(filename=self.filename, data_only=True)
-        self.ws = self.wb.active if worksheet_name is None else self.wb[worksheet_name]
+        self.ws = self.wb[config.get_excel_config('worksheet_name')]
         self.no_ws_err = f"No Worksheet found for {self.filename}"
         self.config = config
 
@@ -58,7 +58,7 @@ class ExcelHandler:
         row_values = [cell.value for cell in self.ws[row_num]]
         keys = self.config.excel_config.keys()
         values = list(self.config.excel_config.values())
-        column_idxs = [column_index_from_string(v) - 1 for v in values]
+        column_idxs = [column_index_from_string(v) - 1 for v in values if v.isalpha() and len(v) == 1]
         zipped = zip(keys, column_idxs)
         return { k: get_formatted_value(key=k, value=str(row_values[v])) for (k,v) in zipped }
 

@@ -56,15 +56,14 @@ def process_data(access_token: str, realm_id: str):
         print(f"\nInvoice Numbers: {qh.invoice_numbers}")
         print("\n")
         qr.generate_qr_codes(ids=qh.invoice_ids, prod_link_function=qh.generate_invoice_link)
-        qr_path_data_to_add = CorrespondingData(col_name="X", data=qr.code_paths)
-        qr_link_data_to_add = CorrespondingData(col_name="Y", data=qr.code_links)
+        qr_path_data_to_add = CorrespondingData(col_name=config.get_excel_config('qr_image_name'), data=qr.code_paths)
+        qr_link_data_to_add = CorrespondingData(col_name=config.get_excel_config('qr_link_name'), data=qr.code_links)
         merge_data_list = qr.add_qrs_excel(
             excel=excel,
-            invoice_num_col_name="G",
+            invoice_num_col_name=config.get_excel_config('invoice_number_name'),
             invoice_nums=qh.invoice_numbers,
             data_lists=[qr_path_data_to_add, qr_link_data_to_add]
         )
-        print(merge_data_list)
         mm.merge_multiple(merge_data_list=merge_data_list)
         print("\n")
         mm.close()

@@ -56,9 +56,10 @@ class ExcelHandler:
         if self.ws is None:
             raise Exception(self.no_ws_err)
         row_values = [cell.value for cell in self.ws[row_num]]
-        keys = self.config.excel_config.keys()
-        values = list(self.config.excel_config.values())
-        column_idxs = [column_index_from_string(v) - 1 for v in values if v.isalpha() and len(v) == 1]
+        filtered = { k:v for k,v in self.config.excel_config if v.isalpha() and len(v) == 1 }
+        keys = filtered.keys()
+        values = filtered.values()
+        column_idxs = [column_index_from_string(v) - 1 for v in values]
         zipped = zip(keys, column_idxs)
         return { k: get_formatted_value(key=k, value=str(row_values[v])) for (k,v) in zipped }
 

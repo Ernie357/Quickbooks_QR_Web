@@ -17,7 +17,7 @@ UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = get_abs_path(UPLOAD_FOLDER)
 app.secret_key = os.getenv("APP_SECRET_KEY")
-is_prod = True
+is_prod = False
 
 def get_error_html(e: Exception) -> str:
     return f'''
@@ -53,16 +53,14 @@ def process_data(access_token: str, realm_id: str):
         mm = MailMergeHandler(template_filename=docx_filename, out_dir=abs_invoice_path)
         print("\n")
         qh.import_csv(filename=csv_filename)
-        print(f"\nInvoice IDs: {qh.invoice_ids}")
-        print(f"\nInvoice Numbers: {qh.invoice_numbers}")
         print("\n")
-        qr.generate_qr_codes(ids=qh.invoice_ids, prod_link_function=qh.generate_invoice_link)
+        qr.generate_qr_codes(invoices=qh.invoices, prod_link_function=qh.generate_invoice_link)
         qr_path_data_to_add = CorrespondingData(col_name=config.get_excel_config('qr_image_name'), data=qr.code_paths)
         qr_link_data_to_add = CorrespondingData(col_name=config.get_excel_config('qr_link_name'), data=qr.code_links)
         merge_data_list = qr.add_qrs_excel(
             excel=excel,
             invoice_num_col_name=config.get_excel_config('invoice_number_name'),
-            invoice_nums=qh.invoice_numbers,
+            invoices=qh.invoices,
             data_lists=[qr_path_data_to_add, qr_link_data_to_add]
         )
         mm.merge_multiple(merge_data_list=merge_data_list)

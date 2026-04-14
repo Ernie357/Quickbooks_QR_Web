@@ -1,12 +1,13 @@
 from openpyxl import load_workbook
 from openpyxl.utils import column_index_from_string
 from openpyxl.cell import Cell, MergedCell
-from typing import List, Callable, get_args
+from typing import Callable, get_args
 from utils import get_formatted_value
 from Config import Config, mail_merge_map, ExcelFieldKey
+from Invoice import FullInvoice
 
 class CorrespondingData:
-    def __init__(self, col_name: str, data: List[str]):
+    def __init__(self, col_name: str, data: list[str]):
         self.col_name = col_name
         self.data = data
     
@@ -40,7 +41,7 @@ class ExcelHandler:
     '''
         Purpose: Adds lists of data to excel meant to correspond with an ID column
     '''
-    def add_corresponding_data(self, row_num: int, idx: int, data_lists: List[CorrespondingData]):
+    def add_corresponding_data(self, row_num: int, idx: int, data_lists: list[CorrespondingData]):
         if self.ws is None or len(data_lists) <= 0:
             raise Exception(self.no_ws_err)
         for corresponding_data in data_lists:
@@ -67,14 +68,14 @@ class ExcelHandler:
         Purpose: Perform operations on specific rows filtered by IDs
         callback: Function to be called for each matched row, gives row info
         id_col_letter: The column letter (like "G") that has the IDs
-        ids: List of IDs to match
+        invoices: List of invoices, correct id field must be used from each obj
         ids_asc: True if IDs in the id_col_letter are logically ascending
     '''
     def iterate_rows_by_ids_bind(
         self, 
         callback: Callable[[tuple[Cell | MergedCell, ...], str, int, int], None],
         id_col_letter: str,
-        ids: List[str],
+        invoices: list[FullInvoice],
         ids_asc: bool = True
     ):
         if self.ws is None:
@@ -82,7 +83,7 @@ class ExcelHandler:
         col_num = column_index_from_string(id_col_letter) - 1
         row_num = 2
         errors = ""
-        for idx, id in enumerate(ids):
+        for idx, inv in enumerate(invoices):
             for row in self.ws.iter_rows(min_row=row_num if ids_asc else 2):
                 if row[col_num].value is None:
                     print("ID", id, "not found in spreadsheet.")
@@ -90,7 +91,7 @@ class ExcelHandler:
                     break
                 row_num = row[col_num].row
                 if row[col_num].value == id:
-                    callback(row, id, idx, row_num if row_num is not None else 2)
+                    callback(row, str(inv.invoice_id), idx, row_num if row_num is not None else 2)
                     break     
         if errors:
             raise Exception(errors)   

@@ -1,18 +1,17 @@
 import qrcode
 import os
-from typing import List, Callable
+from typing import Callable
 from PIL.Image import Image
 from ExcelHandler import ExcelHandler
 from ExcelHandler import CorrespondingData
-from utils import get_full_script_dir
-
+from Invoice import FullInvoice
 ''' 
     Handles QRCode generation and holds program data about them and their links
 '''
 class QRCodeHandler:
     def __init__(self, is_prod: bool, out_dir: str):
-        self.code_paths: List[str] = []
-        self.code_links: List[str] = []
+        self.code_paths: list[str] = []
+        self.code_links: list[str] = []
         self.is_prod = is_prod
         self.out_dir = out_dir
 
@@ -46,19 +45,19 @@ class QRCodeHandler:
     '''
     def generate_qr_codes(
             self,  
-            ids: List[int], 
+            invoices: list[FullInvoice], 
             prod_link_function: Callable[[int], str]
         ):
         print("Generating QR Codes...")
-        if len(ids) <= 0:
+        if len(invoices) <= 0:
             print("\nNo data found. No QR Codes to generate.")
         if not os.path.exists(self.out_dir):
             os.makedirs(self.out_dir)
-        for id in ids:
-            dev_link = f"https://app.qbo.intuit.com/app/invoice?txnId={id}"
-            link = prod_link_function(id) if self.is_prod else dev_link
+        for inv in invoices:
+            dev_link = f"https://app.qbo.intuit.com/app/invoice?txnId={inv.invoice_id}"
+            link = prod_link_function(inv.invoice_id) if self.is_prod else dev_link
             print("QR Link:", link)
-            filename = f"invoice_link_{id}.png"
+            filename = f"invoice_link_{inv.invoice_id}.png"
             (img, _) = self.make_image_from_link(link, filename)
             save_path = os.path.join(self.out_dir, filename)
             self.save_img((img, save_path))
@@ -76,9 +75,9 @@ class QRCodeHandler:
         self, 
         excel: ExcelHandler, 
         invoice_num_col_name: str, 
-        invoice_nums: List[str], 
-        data_lists: List[CorrespondingData]
-    ) -> List[dict[str, str | float | dict ]]:
+        invoices: list[FullInvoice], 
+        data_lists: list[CorrespondingData]
+    ) -> list[dict[str, str | float | dict ]]:
         print("\nAdding QR Code paths to excel Workbook", excel.filename)
         if len(self.code_paths) <= 0:
             print("\nNo QR Codes found.")
@@ -87,6 +86,6 @@ class QRCodeHandler:
             excel.add_corresponding_data(row_num=row_num, idx=idx, data_lists=data_lists)
             merge_data = excel.get_merge_data_from_row(row_num=row_num)
             merge_data_list.append(merge_data)
-        excel.iterate_rows_by_ids_bind(callback=bind, id_col_letter=invoice_num_col_name, ids=invoice_nums)
+        excel.iterate_rows_by_ids_bind(callback=bind, id_col_letter=invoice_num_col_name, invoices=invoices)
         excel.save_file_changes()
         return merge_data_list

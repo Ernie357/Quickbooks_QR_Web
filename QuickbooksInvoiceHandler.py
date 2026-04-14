@@ -1,8 +1,8 @@
 import csv
 import requests
 import datetime
-from typing import List
 from Config import Config
+from Invoice import Invoice, FullInvoice
 
 class UnauthorizedException(Exception):
     pass
@@ -18,10 +18,7 @@ class QuickbooksInvoiceHandler():
         self.is_prod= is_prod
         self.config = config
         self.url_base = "https://quickbooks.api.intuit.com/v3/company/" if self.is_prod else "https://sandbox-quickbooks.api.intuit.com/v3/company/"
-        self.invoice_ids: List[int] = []
-        self.invoice_urls: List[str] = []
-        self.qr_code_paths: List[str] = []
-        self.invoice_numbers: List[str] = []
+        self.invoices: list[FullInvoice] = []
 
     def send_invoice(self, invoice_id: str):
         print("Sending email for invoice ID", invoice_id)
@@ -93,7 +90,7 @@ class QuickbooksInvoiceHandler():
             raise Exception("Error adding customer: ", response.status_code, response.text)
         
     ''' Takes invoice data and corresponding customer ID, returns uploaded invoice ID '''
-    def upload_invoice(self, inv, customer_id: int) -> int:
+    def upload_invoice(self, inv: Invoice, customer_id: int) -> int:
         print("\nUploading invoice with customer ID", customer_id)
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -105,8 +102,8 @@ class QuickbooksInvoiceHandler():
             "Line": [
                 {
                     "DetailType": "SalesItemLineDetail", 
-                    "Amount": float(inv[self.config.get_csv_config('item_amount_name')]),
-                    "Description": inv[self.config.get_csv_config('item_description_name')],
+                    "Amount": float(inv.item_amount),
+                    "Description": inv.item_description,
                     "SalesItemLineDetail": {
                         "ItemRef": {
                             "name": "Services", 
@@ -115,11 +112,11 @@ class QuickbooksInvoiceHandler():
                     }
                 }
             ],
-            "DocNumber": inv[self.config.get_csv_config('invoice_number_name')],
-            "TxnDate": datetime.datetime.strptime(inv[self.config.get_csv_config('invoice_date_name')], "%m/%d/%y").strftime("%Y-%m-%d"),
-            "CustomerRef": {"name": inv[self.config.get_csv_config('customer_name')], "value": customer_id},
-            "DueDate": datetime.datetime.strptime(inv[self.config.get_csv_config('due_date_name')], "%m/%d/%y").strftime("%Y-%m-%d"),
-            "PrivateNote": inv[self.config.get_csv_config('memo_name')]
+            "DocNumber": inv.invoice_number,
+            "TxnDate": datetime.datetime.strptime(inv.invoice_date, "%m/%d/%y").strftime("%Y-%m-%d"),
+            "CustomerRef": {"name": inv.customer_name, "value": customer_id},
+            "DueDate": datetime.datetime.strptime(inv.due_date, "%m/%d/%y").strftime("%Y-%m-%d"),
+            "PrivateNote": inv.memo
         }
         response = requests.post(url=url, headers=headers, json=payload)
         if response.status_code == 401:
@@ -143,14 +140,15 @@ class QuickbooksInvoiceHandler():
             reader = csv.DictReader(file)
             invoices = [row for row in reader]
             for inv in invoices:
-                customer_id = self.upload_customer(inv["*Customer"])
+                structured_invoice = Invoice(inv, self.config)
+                customer_id = self.upload_customer(self.config.get_csv_config('customer_name'))
                 if customer_id <= 0:
                     continue
-                invoice_id = self.upload_invoice(inv, customer_id)
+                invoice_id = self.upload_invoice(structured_invoice, customer_id)
                 if invoice_id <= 0:
                     continue
-                self.invoice_ids.append(invoice_id)
-                self.invoice_numbers.append(inv["*InvoiceNo"])
+                full_invoice = FullInvoice(structured_invoice, invoice_id, customer_id)
+                self.invoices.append(full_invoice)
 
     ''' Takes invoice ID, returns that invoices payment link from API '''
     def generate_invoice_link(self, id: int) -> str:

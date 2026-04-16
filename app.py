@@ -63,6 +63,7 @@ def process_data(access_token: str, realm_id: str):
             invoices=qh.invoices,
             data_lists=[qr_path_data_to_add, qr_link_data_to_add]
         )
+        print(f"merge data list: {merge_data_list}")
         mm.merge_multiple(merge_data_list=merge_data_list)
         print("\n")
         mm.close()

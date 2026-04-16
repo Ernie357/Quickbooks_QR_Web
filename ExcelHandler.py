@@ -83,7 +83,6 @@ class ExcelHandler:
         col_num = column_index_from_string(id_col_letter) - 1
         row_num = 2
         errors = ""
-        print(id_col_letter, col_num)
         for idx, inv in enumerate(invoices):
             id = inv.data['invoice_number_name']
             for row in self.ws.iter_rows(min_row=row_num if ids_asc else 2):

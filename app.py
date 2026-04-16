@@ -57,6 +57,7 @@ def process_data(access_token: str, realm_id: str):
         qr.generate_qr_codes(invoices=qh.invoices, prod_link_function=qh.generate_invoice_link)
         qr_path_data_to_add = CorrespondingData(col_name=config.get_excel_config('qr_image_name'), data=qr.code_paths)
         qr_link_data_to_add = CorrespondingData(col_name=config.get_excel_config('qr_link_name'), data=qr.code_links)
+        print(f"Invoices: {qh.invoices}")
         merge_data_list = qr.add_qrs_excel(
             excel=excel,
             invoice_num_col_name=config.get_excel_config('invoice_number_name'),

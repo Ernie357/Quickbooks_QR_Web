@@ -16,21 +16,6 @@ def get_abs_path(dir_or_filename: str) -> str:
     base = get_full_script_dir()
     return os.path.join(base, dir_or_filename)
 
-merge_name_map = {
-    "Inv_Nbr": column_index_from_string("G") - 1,
-    "Estate_No": column_index_from_string("I") - 1,
-    "Bill_To": column_index_from_string("J") - 1,
-    "Address_1": column_index_from_string("K") - 1,
-    "Address_2": column_index_from_string("L") - 1,
-    "Estate_of": column_index_from_string("M") - 1,
-    "M_1st_Run": column_index_from_string("O") - 1,
-    "M_2nd_Run": column_index_from_string("P") - 1,
-    "M_3rd_Run": column_index_from_string("Q") - 1, 
-    "price": column_index_from_string("R") - 1,
-    "QR_Image": column_index_from_string("X") - 1,
-    "QR_Link": column_index_from_string("Y") - 1
-}
-
 merge_id_key = "Inv_Nbr"
 
 def get_formatted_value(key: str, value: str):

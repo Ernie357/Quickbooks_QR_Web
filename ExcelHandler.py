@@ -91,7 +91,7 @@ class ExcelHandler:
                     break
                 row_num = row[col_num].row
                 if row[col_num].value == id:
-                    callback(row, str(inv.invoice_id), idx, row_num if row_num is not None else 2)
+                    callback(row, str(inv.data["invoice_id"]), idx, row_num if row_num is not None else 2)
                     break     
         if errors:
             raise Exception(errors)   

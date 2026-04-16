@@ -1,6 +1,6 @@
 import configparser
 from werkzeug.datastructures import ImmutableMultiDict
-from typing import Literal
+from typing import Literal, TypedDict
 
 # The below field dicts outline the form input names and form labels as key, value respectively.
 # The form input names also access the ini config data to ensure consistency.
@@ -46,16 +46,57 @@ CsvFieldKey = Literal[
     'memo_name',
     'item_amount_name',
     'item_description_name',
+    'email_address_name'
 ]
+CsvExtendedKey = Literal['invoice_id', 'customer_id']
+CsvFullKey = CsvFieldKey | CsvExtendedKey
+CsvValueType = Literal['string', 'date', 'number']
+class CsvFieldConfig(TypedDict):
+    input_label: str
+    optional: bool
+    type: CsvValueType
 
-csv_fields: dict[CsvFieldKey, str] = {
-    'invoice_number_name': 'Inv # Column Name',
-    'customer_name': 'Customer Column Name',
-    'invoice_date_name': 'Inv Date Column Name',
-    'due_date_name': 'Due Date Column Name',
-    'memo_name': 'Memo Column Name',
-    'item_amount_name': 'Item Amount Column Name',
-    'item_description_name': 'Item Description Column Name'
+csv_fields: dict[CsvFieldKey, CsvFieldConfig] = {
+    'invoice_number_name': {
+        'input_label': 'Inv # Column Name',
+        'optional': False,
+        'type': 'string'    
+    },
+    'customer_name': {
+        'input_label': 'Customer Column Name',
+        'optional': False,
+        'type': 'string'
+    },
+    'invoice_date_name': {
+        'input_label': 'Inv Date Column Name',
+        'optional': False,
+        'type': 'date'
+    },
+    'due_date_name': {
+        'input_label': 'Due Date Column Name',
+        'optional': False,
+        'type': 'date'
+    },
+    'memo_name': {
+        'input_label': 'Memo Column Name',
+        'optional': False,
+        'type': 'string'
+    },
+    'item_amount_name': {
+        'input_label': 'Item Amount Column Name',
+        'optional': False,
+        'type': 'number'
+    },
+    'item_description_name': {
+        'input_label': 'Item Description Column Name',
+        'optional': False,
+        'type': 'string'
+    },
+    'email_address_name': {
+        'input_label': 'Email Address Column Name',
+        'optional': True,
+        'type': 'string'
+    },
 }
 
 # alt+F9 in the template docx to see the fields
@@ -99,7 +140,9 @@ qr_image_key: MailMergeKey = 'QR_Image'
 class Config:
     def __init__(self, config_filename: str):
         config = configparser.ConfigParser()
-        config.read(config_filename)
+        read_files = config.read(config_filename)
+        if len(read_files) <= 0:
+            raise Exception(f"Could not find CSV file {config_filename}.")
         self.excel_config = dict(config['Excel']) if 'Excel' in config else {}
         self.csv_config = dict(config['CSV']) if 'CSV' in config else {}
 

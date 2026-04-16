@@ -1,7 +1,7 @@
 import csv
 import requests
 import datetime
-from Config import Config
+from Config import Config, CsvFieldKey
 from Invoice import Invoice, FullInvoice
 
 class UnauthorizedException(Exception):
@@ -102,8 +102,8 @@ class QuickbooksInvoiceHandler():
             "Line": [
                 {
                     "DetailType": "SalesItemLineDetail", 
-                    "Amount": float(inv.item_amount),
-                    "Description": inv.item_description,
+                    "Amount": inv.data['item_amount_name'],
+                    "Description": inv.data['item_description_name'],
                     "SalesItemLineDetail": {
                         "ItemRef": {
                             "name": "Services", 
@@ -112,11 +112,11 @@ class QuickbooksInvoiceHandler():
                     }
                 }
             ],
-            "DocNumber": inv.invoice_number,
-            "TxnDate": datetime.datetime.strptime(inv.invoice_date, "%m/%d/%y").strftime("%Y-%m-%d"),
-            "CustomerRef": {"name": inv.customer_name, "value": customer_id},
-            "DueDate": datetime.datetime.strptime(inv.due_date, "%m/%d/%y").strftime("%Y-%m-%d"),
-            "PrivateNote": inv.memo
+            "DocNumber": inv.data['invoice_number_name'],
+            "TxnDate": inv.data['invoice_date_name'],
+            "CustomerRef": { "name": inv.data['customer_name'], "value": customer_id },
+            "DueDate": inv.data['due_date_name'],
+            "PrivateNote": inv.data['memo_name']
         }
         response = requests.post(url=url, headers=headers, json=payload)
         if response.status_code == 401:
@@ -131,16 +131,17 @@ class QuickbooksInvoiceHandler():
         else:
             raise Exception("Error adding invoice: ", response.status_code, response.text)
 
-    ''' Loads invoice IDs and numbers into this object from {filename} CSV '''
+    ''' Loads invoice IDs and numbers into this object from {filename} CSV, validating CSV values first '''
     def import_csv(self, filename: str):
         print("Importing CSV data to QuickBooks...\n")
-        with open(filename) as file:
-            if not file:
-                raise Exception("CSV file", filename, "not found.")
-            reader = csv.DictReader(file)
+        with open(filename) as file:    
+            reader = self.verify_import_structure(filename, file)
             invoices = [row for row in reader]
+            partial_invoices: list[Invoice] = []
             for inv in invoices:
                 structured_invoice = Invoice(inv, self.config)
+                partial_invoices.append(structured_invoice)
+            for inv in partial_invoices:
                 customer_id = self.upload_customer(self.config.get_csv_config('customer_name'))
                 if customer_id <= 0:
                     continue
@@ -149,7 +150,7 @@ class QuickbooksInvoiceHandler():
                     continue
                 full_invoice = FullInvoice(structured_invoice, invoice_id, customer_id)
                 self.invoices.append(full_invoice)
-
+                
     ''' Takes invoice ID, returns that invoices payment link from API '''
     def generate_invoice_link(self, id: int) -> str:
         print("\nGenerating invoice link for ID", id)
@@ -171,3 +172,14 @@ class QuickbooksInvoiceHandler():
             return link
         else:
             raise Exception("Error generating invoice link for ID", id)
+        
+    def verify_import_structure(self, filename: str, file):
+        if not file:
+            raise Exception(f"CSV file {filename} not found.")
+        reader = csv.DictReader(file)
+        if reader is None or reader.fieldnames is None:
+            raise Exception(f"CSV file {filename} is empty.")
+        for col in reader.fieldnames:
+            if col not in CsvFieldKey:
+                raise Exception(f"Column name {col} does not exist in the config.")
+        return reader

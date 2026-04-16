@@ -54,10 +54,12 @@ class QRCodeHandler:
         if not os.path.exists(self.out_dir):
             os.makedirs(self.out_dir)
         for inv in invoices:
-            dev_link = f"https://app.qbo.intuit.com/app/invoice?txnId={inv.invoice_id}"
-            link = prod_link_function(inv.invoice_id) if self.is_prod else dev_link
+            if inv.data['invoice_id'] is None:
+                raise Exception("Missing value for customer_id.")
+            dev_link = f"https://app.qbo.intuit.com/app/invoice?txnId={inv.data['invoice_id']}"
+            link = prod_link_function(int(inv.data['invoice_id'])) if self.is_prod else dev_link
             print("QR Link:", link)
-            filename = f"invoice_link_{inv.invoice_id}.png"
+            filename = f"invoice_link_{inv.data['invoice_id']}.png"
             (img, _) = self.make_image_from_link(link, filename)
             save_path = os.path.join(self.out_dir, filename)
             self.save_img((img, save_path))

@@ -19,9 +19,9 @@ def get_abs_path(dir_or_filename: str) -> str:
 merge_id_key = "Inv_Nbr"
 
 def get_formatted_value(key: str, value: str):
-    if key == "price" and value is not None:
+    if key == "price_name" and value is not None:
         return float(value)
-    if "Run" in key:
+    if "run" in key:
         if value == "None":
             return ""
         dt = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")

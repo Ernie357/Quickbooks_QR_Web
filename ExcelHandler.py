@@ -84,7 +84,7 @@ class ExcelHandler:
         row_num = 2
         errors = ""
         for idx, inv in enumerate(invoices):
-            id = inv.data['invoice_id']
+            id = inv.data['invoice_number_name']
             for row in self.ws.iter_rows(min_row=row_num if ids_asc else 2):
                 if row[col_num].value is None:
                     print("ID", id, "not found in spreadsheet.\n")

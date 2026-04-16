@@ -180,6 +180,6 @@ class QuickbooksInvoiceHandler():
         if reader is None or reader.fieldnames is None:
             raise Exception(f"CSV file {filename} is empty.")
         for col in reader.fieldnames:
-            if col not in CsvFieldKey:
+            if col not in self.config.csv_config.keys():
                 raise Exception(f"Column name {col} does not exist in the config.")
         return reader

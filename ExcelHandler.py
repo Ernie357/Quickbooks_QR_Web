@@ -84,14 +84,15 @@ class ExcelHandler:
         row_num = 2
         errors = ""
         for idx, inv in enumerate(invoices):
+            id = inv.data['invoice_id']
             for row in self.ws.iter_rows(min_row=row_num if ids_asc else 2):
                 if row[col_num].value is None:
-                    print("ID", id, "not found in spreadsheet.")
-                    errors += f"ID {id} not found in spreadsheet."
+                    print("ID", id, "not found in spreadsheet.\n")
+                    errors += f"ID {id} not found in spreadsheet.\n"
                     break
                 row_num = row[col_num].row
                 if row[col_num].value == id:
-                    callback(row, str(inv.data["invoice_id"]), idx, row_num if row_num is not None else 2)
+                    callback(row, str(id), idx, row_num if row_num is not None else 2)
                     break     
         if errors:
             raise Exception(errors)   

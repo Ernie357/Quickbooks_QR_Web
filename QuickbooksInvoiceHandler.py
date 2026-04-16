@@ -145,10 +145,10 @@ class QuickbooksInvoiceHandler():
                 customer_id = self.upload_customer(self.config.get_csv_config('customer_name'))
                 if customer_id <= 0:
                     continue
-                invoice_id = self.upload_invoice(structured_invoice, customer_id)
+                invoice_id = self.upload_invoice(inv, customer_id)
                 if invoice_id <= 0:
                     continue
-                full_invoice = FullInvoice(structured_invoice, invoice_id, customer_id)
+                full_invoice = FullInvoice(inv, invoice_id, customer_id)
                 self.invoices.append(full_invoice)
                 
     ''' Takes invoice ID, returns that invoices payment link from API '''
